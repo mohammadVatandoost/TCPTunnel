@@ -18,8 +18,13 @@ func (endpoint *Endpoint) String() string {
 
 func main() {
 
+	// connection1 := &Endpoint{
+	// 	Host: "localhost",
+	// 	Port: 4570,
+	// }
+
 	connection1 := &Endpoint{
-		Host: "localhost",
+		Host: "0.0.0.0",
 		Port: 4570,
 	}
 
@@ -29,7 +34,7 @@ func main() {
 	// }
 
 	connection2 := &Endpoint{
-		Host: "localhost",
+		Host: "0.0.0.0",
 		Port: 4567,
 	}
 

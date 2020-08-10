@@ -29,9 +29,14 @@ func main() {
 	}
 
 	connection1 := &Endpoint{
-		Host: "localhost",
+		Host: "185.206.94.234",
 		Port: 4570,
 	}
+
+	// connection1 := &Endpoint{
+	// 	Host: "",
+	// 	Port: 4570,
+	// }
 
 	// listener, err := net.Listen("tcp", connection1.String())
 	// if err != nil {
@@ -41,9 +46,11 @@ func main() {
 
 	conn1, err := net.Dial("tcp", connection1.String())
 	if err != nil {
-		fmt.Printf("connection 1 error: %s", err)
+		fmt.Println("connection 1 error: ", err)
 		os.Exit(1)
 	}
+
+	fmt.Println("Connection 1 connected")
 
 	conn2, err := net.Dial("tcp", connection2.String())
 	if err != nil {
