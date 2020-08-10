@@ -38,7 +38,7 @@ RUN go build main.go
 # better local development with more advanced topics
 # https://github.com/BretFisher/node-docker-good-defaults
 
-EXPOSE 4567 4568
+EXPOSE 4567 4568 4570
 
 
 # CMD ["./main"]

@@ -23,14 +23,14 @@ func main() {
 	//     Port: 4567,
 	// }
 
-	connection1 := &Endpoint{
+	connection2 := &Endpoint{
 		Host: "localhost",
 		Port: 22,
 	}
 
-	connection2 := &Endpoint{
-		Host: "192.168.2.2",
-		Port: 4568,
+	connection1 := &Endpoint{
+		Host: "localhost",
+		Port: 4570,
 	}
 
 	// listener, err := net.Listen("tcp", connection1.String())

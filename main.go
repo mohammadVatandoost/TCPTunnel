@@ -18,32 +18,32 @@ func (endpoint *Endpoint) String() string {
 
 func main() {
 
-	// connection1 := &Endpoint{
-	// 	Host: "localhost",
-	//     Port: 4567,
-	// }
-
 	connection1 := &Endpoint{
-		Host: "192.168.2.9",
-		Port: 22,
+		Host: "localhost",
+		Port: 4570,
 	}
+
+	// connection1 := &Endpoint{
+	// 	Host: "192.168.2.9",
+	// 	Port: 22,
+	// }
 
 	connection2 := &Endpoint{
 		Host: "localhost",
-		Port: 4568,
+		Port: 4567,
 	}
 
-	// listener, err := net.Listen("tcp", connection1.String())
-	// if err != nil {
-	// 	fmt.Println("connection1 error :", err)
-	// 	os.Exit(1)
-	// }
-
-	conn1, err := net.Dial("tcp", connection1.String())
+	listener, err := net.Listen("tcp", connection1.String())
 	if err != nil {
-		fmt.Printf("connection error: %s", err)
+		fmt.Println("connection1 error :", err)
 		os.Exit(1)
 	}
+
+	// conn1, err := net.Dial("tcp", connection1.String())
+	// if err != nil {
+	// 	fmt.Printf("connection error: %s", err)
+	// 	os.Exit(1)
+	// }
 
 	listener2, err := net.Listen("tcp", connection2.String())
 	if err != nil {
@@ -51,18 +51,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	// defer listener.Close()
-	defer conn1.Close()
+	defer listener.Close()
+	// defer conn1.Close()
 
 	defer listener2.Close()
 
 	for {
-		// conn1, err := listener.Accept()
-		// if err != nil {
-		// 	fmt.Println("error :", err)
-		//     os.Exit(1)
-		// }
-		// fmt.Println("connection 1 accept ")
+		conn1, err := listener.Accept()
+		if err != nil {
+			fmt.Println("error :", err)
+			os.Exit(1)
+		}
+		fmt.Println("connection 1 accept ")
 		conn2, err := listener2.Accept()
 		if err != nil {
 			fmt.Println("error :", err)
