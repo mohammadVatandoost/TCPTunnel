@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"sync"
 )
 
 type Endpoint struct {
@@ -17,7 +18,7 @@ func (endpoint *Endpoint) String() string {
 }
 
 func main() {
-
+	var wg sync.WaitGroup
 	// connection1 := &Endpoint{
 	// 	Host: "localhost",
 	// 	Port: 4570,
@@ -38,17 +39,11 @@ func main() {
 		Port: 4567,
 	}
 
-	listener, err := net.Listen("tcp", connection1.String())
+	listener1, err := net.Listen("tcp", connection1.String())
 	if err != nil {
 		fmt.Println("connection1 error :", err)
 		os.Exit(1)
 	}
-
-	// conn1, err := net.Dial("tcp", connection1.String())
-	// if err != nil {
-	// 	fmt.Printf("connection error: %s", err)
-	// 	os.Exit(1)
-	// }
 
 	listener2, err := net.Listen("tcp", connection2.String())
 	if err != nil {
@@ -56,28 +51,48 @@ func main() {
 		os.Exit(1)
 	}
 
-	defer listener.Close()
-	// defer conn1.Close()
+	// defer listener1.Close()
+	// defer listener2.Close()
 
-	defer listener2.Close()
+	channelL1 := make(chan net.Conn)
+	channelL2 := make(chan net.Conn)
+	wg.Add(1)
+	go conListner(listener1, channelL1, channelL2, &wg) 
+	wg.Add(1)
+	go conListner(listener2, channelL2, channelL2, &wg) 
 
+	// for {
+
+	// 	conn2, err := listener2.Accept()
+	// 	if err != nil {
+	// 		fmt.Println("error :", err)
+	// 		os.Exit(1)
+	// 	}
+	// 	fmt.Println("connection 2 accept ")
+	// 	go copyConn(conn1, conn2)
+	// 	go copyConn(conn2, conn1)
+
+	// }
+
+	wg.Wait()
+	fmt.Println("Main: Completed")
+}
+
+func conListner(listener net.Listener, channelTx chan net.Conn, channelRx chan net.Conn, wg *sync.WaitGroup) {
+	defer wg.Done()
 	for {
 		conn1, err := listener.Accept()
 		if err != nil {
 			fmt.Println("error :", err)
 			os.Exit(1)
 		}
-		fmt.Println("connection 1 accept ")
-		conn2, err := listener2.Accept()
-		if err != nil {
-			fmt.Println("error :", err)
-			os.Exit(1)
-		}
-		fmt.Println("connection 2 accept ")
+		fmt.Println("connection  accept ")
+		channelTx <- conn1
+		conn2 := <- channelRx
 		go copyConn(conn1, conn2)
-		go copyConn(conn2, conn1)
-
 	}
+
+	defer listener.Close()
 }
 
 func copyConn(writer, reader net.Conn) {
