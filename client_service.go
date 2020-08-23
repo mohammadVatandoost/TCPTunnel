@@ -9,6 +9,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"sync"
+	"time"
 )
 
 type Endpoint struct {
@@ -82,6 +84,7 @@ func main() {
 	// 	os.Exit(1)
 	// }
 
+	var wg sync.WaitGroup
 	conn1, err := net.Dial("tcp", connection1.String())
 	if err != nil {
 		fmt.Println("connection 1 error: ", err)
@@ -96,15 +99,44 @@ func main() {
 		os.Exit(1)
 	}
 
-	// defer listener.Close()
+	fmt.Println("Connection 2 connected")
+
 	defer conn1.Close()
 	defer conn2.Close()
+	wg.Add(1)
+	go copyConn(conn1, conn2, &wg)
+	wg.Add(1)
+	go copyConn(conn2, conn1, &wg)
+	wg.Wait()
+	for range time.Tick(time.Minute * 1) {
+		conn1, err := net.Dial("tcp", connection1.String())
+		if err != nil {
+			fmt.Println("connection 1 error: ", err)
+			os.Exit(1)
+		}
 
-	go copyConn(conn1, conn2)
-	go copyConn(conn2, conn1)
+		fmt.Println("Connection 1 connected")
+
+		conn2, err := net.Dial("tcp", connection2.String())
+		if err != nil {
+			fmt.Printf("connection 2 error: %s", err)
+			os.Exit(1)
+		}
+
+		fmt.Println("Connection 2 connected")
+
+		defer conn1.Close()
+		defer conn2.Close()
+		wg.Add(1)
+		go copyConn(conn1, conn2, &wg)
+		wg.Add(1)
+		go copyConn(conn2, conn1, &wg)
+		wg.Wait()
+	}
 }
 
-func copyConn(writer, reader net.Conn) {
+func copyConn(writer, reader net.Conn, wg *sync.WaitGroup) {
+	defer wg.Done()
 	defer writer.Close()
 	defer reader.Close()
 
