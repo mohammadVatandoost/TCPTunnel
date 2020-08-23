@@ -28,6 +28,7 @@ func (res *RequestData) UnmarshalJSON(buf []byte) {
 type ResponseData struct {
 	Valid   int    `json:"valid"`
 	Message string `json:"message"`
+	PortNum int    `json:"portnum"`
 }
 
 func main() {
@@ -67,14 +68,15 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 func sendResponse(data RequestData, w http.ResponseWriter, r *http.Request) {
 	var res ResponseData
-	if val, ok := tokens[data.Token]; ok {
+	if _, ok := tokens[data.Token]; ok {
 		// if val {
 		// 	res.Valid = 0
 		// 	res.Message = Err_Use_Token_In_multiple_Device
 		// } else {
-			res.Valid = 1
-			res.Message = ""
-			tokens[data.Token] = true
+		res.Valid = 1
+		res.Message = ""
+		tokens[data.Token] = true
+		res.PortNum = 4567
 		// }
 	} else {
 		res.Valid = 0

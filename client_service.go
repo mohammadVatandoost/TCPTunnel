@@ -1,9 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
+	"net/http"
 	"os"
 )
 
@@ -12,25 +16,53 @@ type Endpoint struct {
 	Port int
 }
 
+type RequestData struct {
+	Token string `json:"token"`
+}
+
+type ResponseData struct {
+	Valid   int    `json:"valid"`
+	Message string `json:"message"`
+	PortNum int    `json:"portnum"`
+}
+
+func (res *ResponseData) UnmarshalJSON(buf []byte) {
+	json.Unmarshal(buf, &res)
+}
+
 func (endpoint *Endpoint) String() string {
 	return fmt.Sprintf("%s:%d", endpoint.Host, endpoint.Port)
 }
 
+// const serverPort = "3245"
+// var connection1 = &Endpoint{
+// 	Host: "185.206.94.234",
+// 	Port: 4570,
+// }
+
+var connection1 = &Endpoint{
+	Host: "192.168.2.2",
+	Port: 4570,
+}
+
+// const serverURL = "0.0.0.0:3245"
+const serverURL = "192.168.2.2:3245"
+
 func main() {
 
-	// connection1 := &Endpoint{
-	// 	Host: "localhost",
-	//     Port: 4567,
-	// }
+	if len(os.Args) != 2 {
+		fmt.Println("Please Provide token")
+		os.Exit(1)
+	}
+	token := os.Args[1]
+
+	if checkToken(token) {
+		os.Exit(0)
+	}
 
 	connection2 := &Endpoint{
 		Host: "localhost",
 		Port: 22,
-	}
-
-	connection1 := &Endpoint{
-		Host: "185.206.94.234",
-		Port: 4570,
 	}
 
 	// connection1 := &Endpoint{
@@ -81,3 +113,26 @@ func copyConn(writer, reader net.Conn) {
 // func tunnel(conn1 net.Conn, conn2 net.Conn) {
 
 // }
+
+func checkToken(token string) bool {
+	var req RequestData
+	req.Token = token
+	reqMessage, _ := json.Marshal(req)
+	resp, err := http.Post(serverURL, "application/json", bytes.NewBuffer(reqMessage))
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("requestHandler failed to ioutil.ReadAll(resp.Body):", err)
+		os.Exit(1)
+	}
+	var data ResponseData
+	data.UnmarshalJSON(body)
+
+	if data.Valid == 1 {
+		connection1.Port = data.PortNum
+		return true
+	}
+
+	fmt.Println(data.Message)
+	return false
+}

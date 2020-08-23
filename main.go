@@ -54,28 +54,43 @@ func main() {
 	// defer listener1.Close()
 	// defer listener2.Close()
 
-	channelL1 := make(chan net.Conn)
-	channelL2 := make(chan net.Conn)
-	wg.Add(1)
-	go conListner(listener1, channelL1, channelL2, &wg) 
-	wg.Add(1)
-	go conListner(listener2, channelL2, channelL2, &wg) 
+	// channelL1 := make(chan net.Conn)
+	// channelL2 := make(chan net.Conn)
+	// wg.Add(1)
+	// go conListner(listener1, channelL1, channelL2, &wg)
+	// wg.Add(1)
+	// go conListner(listener2, channelL2, channelL2, &wg)
 
-	// for {
+	for {
 
-	// 	conn2, err := listener2.Accept()
-	// 	if err != nil {
-	// 		fmt.Println("error :", err)
-	// 		os.Exit(1)
-	// 	}
-	// 	fmt.Println("connection 2 accept ")
-	// 	go copyConn(conn1, conn2)
-	// 	go copyConn(conn2, conn1)
+		conn1, err := listener1.Accept()
+		if err != nil {
+			fmt.Println("error :", err)
+			os.Exit(1)
+		}
+		fmt.Println("device connection  accepted ")
+		go connectionListener(listener2, conn1)
+		// go copyConn(conn1, conn2)
+		// go copyConn(conn2, conn1)
 
-	// }
+	}
 
-	wg.Wait()
+	// wg.Wait()
 	fmt.Println("Main: Completed")
+}
+
+func connectionListener(listener net.Listener, conn1 net.Conn) {
+	for {
+		conn2, err := listener.Accept()
+		if err != nil {
+			fmt.Println("error :", err)
+			os.Exit(1)
+		}
+		fmt.Println("connection 2 accept ")
+		go copyConn(conn1, conn2)
+		go copyConn(conn2, conn1)
+
+	}
 }
 
 func conListner(listener net.Listener, channelTx chan net.Conn, channelRx chan net.Conn, wg *sync.WaitGroup) {
@@ -88,7 +103,7 @@ func conListner(listener net.Listener, channelTx chan net.Conn, channelRx chan n
 		}
 		fmt.Println("connection  accept ")
 		channelTx <- conn1
-		conn2 := <- channelRx
+		conn2 := <-channelRx
 		go copyConn(conn1, conn2)
 	}
 
