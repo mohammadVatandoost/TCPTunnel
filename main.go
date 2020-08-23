@@ -26,7 +26,7 @@ func main() {
 
 	connection1 := &Endpoint{
 		Host: "0.0.0.0",
-		Port: 4570,
+		Port: 4567,
 	}
 
 	// connection1 := &Endpoint{
@@ -36,7 +36,7 @@ func main() {
 
 	connection2 := &Endpoint{
 		Host: "0.0.0.0",
-		Port: 4567,
+		Port: 4570,
 	}
 
 	listener1, err := net.Listen("tcp", connection1.String())

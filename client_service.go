@@ -142,7 +142,7 @@ func copyConn(writer, reader net.Conn, wg *sync.WaitGroup) {
 
 	_, err := io.Copy(writer, reader)
 	if err != nil {
-		fmt.Printf("io.Copy error: %s", err)
+		fmt.Println("io.Copy error:", err)
 	}
 
 	fmt.Println("copyConn")
