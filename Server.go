@@ -10,7 +10,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-const serverPort = "3245"
+const serverPort = "3245"  //3245
 const Err_Not_Valid_Token = "Token is not valid"
 const Err_Use_Token_In_multiple_Device = "Token is used by another device"
 

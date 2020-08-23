@@ -45,8 +45,14 @@ var connection1 = &Endpoint{
 	Port: 4570,
 }
 
-// const serverURL = "0.0.0.0:3245"
-const serverURL = "192.168.2.2:3245"
+// var connection1 = &Endpoint{
+// 	Host: "0.0.0.0",
+// 	Port: 4570,
+// }
+
+// const serverURL = "http://0.0.0.0:3245"
+
+const serverURL = "http://192.168.2.2:3245"
 
 func main() {
 
@@ -56,7 +62,7 @@ func main() {
 	}
 	token := os.Args[1]
 
-	if checkToken(token) {
+	if !checkToken(token) {
 		os.Exit(0)
 	}
 
@@ -119,7 +125,10 @@ func checkToken(token string) bool {
 	req.Token = token
 	reqMessage, _ := json.Marshal(req)
 	resp, err := http.Post(serverURL, "application/json", bytes.NewBuffer(reqMessage))
-
+	if err != nil {
+		fmt.Println("requestHandler failed to http.Post:", err)
+		os.Exit(1)
+	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("requestHandler failed to ioutil.ReadAll(resp.Body):", err)

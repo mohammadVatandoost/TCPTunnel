@@ -18,7 +18,7 @@ func (endpoint *Endpoint) String() string {
 }
 
 func main() {
-	var wg sync.WaitGroup
+	// var wg sync.WaitGroup
 	// connection1 := &Endpoint{
 	// 	Host: "localhost",
 	// 	Port: 4570,
