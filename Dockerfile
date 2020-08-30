@@ -41,4 +41,4 @@ RUN go build main.go
 EXPOSE 4567 4568 4570
 
 
-# CMD ["./main"]
+CMD ["./main"]
